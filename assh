@@ -1,0 +1,60 @@
+#!/usr/local/opt/python/bin/python2.7
+
+import boto.ec2
+import sys, subprocess
+
+region = "eu-west-1"
+keyPath = " -i /Users/antoineroy/.keys/"
+user = "ec2-user"
+userBis = "ubuntu"
+liste = []
+
+if len(sys.argv) == 2:
+    my_tag = str(sys.argv[1])
+else:
+    my_tag = ""
+
+try:
+    connection_ec2 = boto.ec2.connect_to_region(region, profile_name=aws_profile)
+    my_instances = connection_ec2.get_only_instances(filters={'instance-state-name': 'running'})
+except:
+    connection_ec2 = boto.ec2.connect_to_region(region)
+    my_instances = connection_ec2.get_only_instances(filters={'instance-state-name': 'running'})
+
+for instance in my_instances:
+    if (my_tag.lower() in instance.tags['Name'].lower()):
+        tempo = instance.tags['Name'].lower() + "~" + str(instance.ip_address) + "~" +  str(instance.key_name)
+        liste.append(tempo)
+
+if len(liste) == 1:
+    try:
+        subprocess.check_call(['ssh '+user+'@'+liste[0].split("~")[1]+keyPath+liste[0].split("~")[2]], shell=True)
+    except:
+        subprocess.call(['ssh '+userBis+'@'+liste[0].split("~")[1]+keyPath+liste[0].split("~")[2]], shell=True)
+else:
+    if len(liste) % 2 != 0:
+        liste.append(" ")
+    split = len(liste)/2
+    l1 = liste[0:split]
+    l2 = liste[split:]
+    i = 0
+    for key, value in zip(l1,l2):
+        print "[{2}]-> {0:<50s} [{3}]-> {1}".format(key.split("~")[0], value.split("~")[0], str(i), str(i+1))
+        i = i+2
+    server = raw_input('Choose a server [0] : ')
+    
+    if server == "":
+        try:
+            subprocess.check_call(['ssh '+user+'@'+l1[0].split("~")[1]+keyPath+l1[0].split("~")[2]])
+        except:
+            subprocess.call(['ssh '+userBis+'@'+l1[0].split("~")[1]+keyPath+l1[0].split("~")[2]], shell=True)
+    elif (int(server) % 2 == 0):
+        try:
+            subprocess.check_call(['ssh '+user+'@'+l1[int(server)/2].split("~")[1]+keyPath+l1[int(server)/2].split("~")[2]])
+        except:
+            subprocess.call(['ssh '+userBis+'@'+l1[int(server)/2].split("~")[1]+keyPath+l1[int(server)/2].split("~")[2]], shell=True)
+    else:
+        try:
+            subprocess.check_call(['ssh '+user+'@'+l2[int(server)/2].split("~")[1]+keyPath+l2[int(server)/2].split("~")[2]], shell=True)
+        except:
+            subprocess.call(['ssh '+userBis+'@'+l2[int(server)/2].split("~")[1]+keyPath+l2[int(server)/2].split("~")[2]], shell=True)
