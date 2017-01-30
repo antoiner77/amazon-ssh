@@ -4,7 +4,7 @@ import boto.ec2
 import sys, subprocess
 
 region = "eu-west-1"
-keyPath = " -i /Users/antoineroy/.keys/"
+keyPath = " -i /. . . /.ssh/"
 user = "ec2-user"
 userBis = "ubuntu"
 liste = []
