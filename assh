@@ -3,7 +3,7 @@ import boto3
 import sys, subprocess
 import pprint 
 
-keyPath = " -i /Users/antoineroy/.ssh/"
+keyPath = " -i /Users/path/.ssh/"
 user = "ec2-user"
 userBis = "ubuntu"
 liste = []
